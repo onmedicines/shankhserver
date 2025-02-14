@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -39,7 +40,8 @@ app.post("/register", async (req, res) => {
     if (emailAlreadyExists) throw new Error("Email already exists");
 
     await User.create({ name, username, email, password });
-    return res.status(200).json({ message: "User created successfully" });
+    const token = jwt.sign({ username }, process.env.SECRET_KEY);
+    return res.status(200).json({ message: "User created successfully", token });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -51,7 +53,8 @@ app.post("/login", async (req, res) => {
     const userExists = await User.findOne({ username });
     if (!userExists) throw new Error("Invalid username or password");
     if (password !== userExists.password) throw new Error("Invalid username or password");
-    return res.status(200).json({ message: "User logged in successfully" });
+    const token = jwt.sign({ username }, process.env.SECRET_KEY);
+    return res.status(200).json({ message: "User logged in successfully", token });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
