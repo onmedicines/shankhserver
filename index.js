@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { User } from "./schema/user.js";
+import { City } from "./schema/City.js";
+import { Flight } from "./schema/Flight.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -55,14 +57,35 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/user", async (req, res) => {
+// app.get("/user", async (req, res) => {
+//   try {
+//     const { username } = req.payload;
+//     if (!username) throw new Error("Cannot verify user");
+//     const userData = await User.findOne({ username }, { password: 0 });
+//     if (!userData) throw new Error("Could not fetch user data");
+//     return res.status(200).json(userData);
+//   } catch (error) {
+//     return res.status(400).json({ message: error.message });
+//   }
+// });
+
+app.get("/cities", async (req, res) => {
   try {
-    const { username } = req.payload;
-    if (!username) throw new Error("Cannot verify user");
-    const userData = await User.findOne({ username }, { password: 0 });
-    if (!userData) throw new Error("Could not fetch user data");
-    return res.status(200).json(userData);
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
+    const cities = await City.find({});
+    if (!cities) throw new Error("Cities could not be fetched.");
+    return res.status(200).json(cities);
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+});
+
+app.get("/flights", async (req, res) => {
+  try {
+    let { from, to, date } = req.query;
+    const availableFlights = await Flight.find({ from, to, date });
+    if (!availableFlights) throw new Error("No flights found");
+    return res.status(200).json(availableFlights);
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
   }
 });
