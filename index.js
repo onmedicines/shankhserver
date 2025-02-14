@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { User } from "./schema/user.js";
+import { User } from "./schema/User.js";
 import { City } from "./schema/City.js";
 import { Flight } from "./schema/Flight.js";
 
