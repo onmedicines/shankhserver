@@ -31,6 +31,24 @@ app.get("/", (req, res) => {
   res.send("<h1>Welcome to Shankh</br>");
 });
 
+async function authenticate(req, res, next) {
+  try {
+    // format: BEARER <token>
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) throw new Error("cannot be authorized!!");
+    const payload = jwt.verify(token, process.env.SECRET_KEY);
+    req.payload = payload;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: err.message });
+  }
+}
+
+app.get("/validate-token", authenticate, (req, res) => {
+  return res.status(200).json({ message: "valid" });
+});
+
 app.post("/register", async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
